@@ -18,6 +18,8 @@
         .game-card {
             background: rgba(30, 10, 10, 0.95); border: 5px solid var(--secondary); border-radius: 25px;
             padding: 30px; box-shadow: 0 0 50px rgba(255, 51, 0, 0.5); width: 95%; max-width: 750px; text-align: center;
+            /* 增加盒模型设置，防止padding撑大宽度 */
+            box-sizing: border-box; 
         }
         .header { display: flex; justify-content: space-between; font-size: 1.2rem; color: var(--secondary); margin-bottom: 10px; }
         .progress-track { width: 100%; height: 14px; background: #441111; border-radius: 7px; margin-bottom: 25px; overflow: hidden; border: 1px solid var(--primary); }
@@ -52,6 +54,38 @@
         .buy-btn { background: linear-gradient(45deg, #ff0055, #ff3300); color: white; box-shadow: 0 5px 0 #990033; animation: pulse 1.5s infinite; }
 
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+        /* ========================================= */
+        /* 👇 手机端适配代码 (屏幕小于600px时生效) 👇 */
+        /* ========================================= */
+        @media screen and (max-width: 600px) {
+            /* 1. 缩小容器边距，腾出空间 */
+            .game-card { padding: 15px 15px; border-width: 3px; border-radius: 15px; width: 92%; }
+            
+            /* 2. 强制缩小标题字号 (使用!important覆盖内联样式) */
+            h1[style] { font-size: 2.2rem !important; margin-top: 0; }
+            
+            /* 3. 缩小题目核心大字 */
+            .q-phrase { font-size: 2.5rem; letter-spacing: 2px; }
+            .q-phrase-container { margin: 15px 0; gap: 5px; }
+            .q-instruction { font-size: 1.2rem; }
+
+            /* 4. 调整选项按钮大小 */
+            .options-grid { gap: 10px; }
+            .option-btn { padding: 15px 5px; font-size: 1.6rem; border-radius: 12px; }
+
+            /* 5. 调整营销按钮和正文 */
+            .action-btn { padding: 15px 30px !important; font-size: 1.4rem !important; width: 100%; box-sizing: border-box; }
+            .feedback-box { padding: 15px; margin-top: 15px; }
+            .fb-title { font-size: 1.4rem; }
+            .fb-text { font-size: 1.2rem; }
+            
+            /* 6. 首页文字调整 */
+            #start-screen div[style*="font-size: 1.4rem"] {
+                font-size: 1.1rem !important;
+                padding: 15px !important;
+            }
+        }
     </style>
 </head>
 <body>

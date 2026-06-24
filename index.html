@@ -2,257 +2,1160 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>【试玩】五年级语文：哪吒封神榜</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>五年级错字本听写</title>
     <style>
         :root {
-            --primary: #ff3300; --secondary: #ffcc00; --dark: #220a0a;
-            --light: #fff5e6; --correct: #00e676; --wrong: #ff1744;
+            --primary: #0f9f8f;
+            --primary-dark: #0f766e;
+            --primary-light: #ccfbf1;
+            --accent: #f97316;
+            --accent-light: #ffedd5;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --bg: linear-gradient(135deg, #ecfeff 0%, #f0fdfa 50%, #fff7ed 100%);
+            --card: rgba(255,255,255,0.96);
+            --text: #134e4a;
+            --sub: #6b7280;
+            --border: rgba(15,159,143,0.16);
+            --shadow: 0 8px 32px rgba(15,159,143,0.16);
         }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body {
-            margin: 0; padding: 0; font-family: 'KaiTi', '楷体', serif;
-            background-color: var(--dark);
-            background-image: radial-gradient(circle at 50% 50%, rgba(255, 51, 0, 0.2) 0%, transparent 80%);
-            color: var(--light); min-height: 100vh; display: flex; justify-content: center; align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            color: var(--text);
+            padding: 12px;
         }
-        .game-card {
-            background: rgba(30, 10, 10, 0.95); border: 5px solid var(--secondary); border-radius: 25px;
-            padding: 30px; box-shadow: 0 0 50px rgba(255, 51, 0, 0.5); width: 95%; max-width: 750px; text-align: center;
-            /* 增加盒模型设置，防止padding撑大宽度 */
-            box-sizing: border-box; 
+        /* ===== SCREENS ===== */
+        .screen { display:none; }
+        .screen.active { display:block; }
+
+        /* ===== COMMON ===== */
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 22px 18px;
         }
-        .header { display: flex; justify-content: space-between; font-size: 1.2rem; color: var(--secondary); margin-bottom: 10px; }
-        .progress-track { width: 100%; height: 14px; background: #441111; border-radius: 7px; margin-bottom: 25px; overflow: hidden; border: 1px solid var(--primary); }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #ffcc00, #ff3300); width: 0%; transition: width 0.3s; }
-        .q-badge { background: var(--primary); display: inline-block; padding: 6px 16px; border-radius: 12px; font-size: 1.1rem; margin-bottom: 15px; color: white; font-weight: bold;}
-        
-        .q-phrase-container { display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 25px 0; }
-        .q-instruction { font-size: 1.6rem; color: #aaa; } 
-        /* 核心优化：高亮字样式 */
-        .q-phrase { font-size: 4rem; color: var(--light); text-shadow: 0 0 20px var(--primary); white-space: nowrap; letter-spacing: 5px; }
-        .highlight-y { color: #ffcc00; font-weight: bold; font-size: 1.1em; border-bottom: 4px solid #ffcc00; padding-bottom: 5px; text-shadow: 0 0 10px #ff9900; }
-
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .option-btn {
-            background: rgba(255,255,255,0.05); border: 2px solid #662222; color: var(--light);
-            padding: 20px; font-size: 2.2rem; border-radius: 18px; cursor: pointer; transition: 0.2s;
+        .btn {
+            border: none; border-radius: 50px; font-weight: 800;
+            cursor: pointer; transition: all 0.15s; display: flex;
+            align-items: center; justify-content: center; gap: 6px;
         }
-        .option-btn:hover { border-color: var(--secondary); background: rgba(255, 204, 0, 0.1); }
-        .option-btn.correct { background: var(--correct) !important; color: #000; font-weight: bold; }
-        .option-btn.wrong { background: var(--wrong) !important; }
-        
-        .feedback-box { display: none; margin-top: 25px; padding: 20px; border: 2px dashed var(--secondary); background: rgba(0,0,0,0.6); text-align: left; }
-        .fb-title { font-size: 2rem; font-weight: bold; display: block; margin-bottom: 10px; }
-        .fb-text { font-size: 1.6rem; line-height: 1.5; color: #fff; }
-        
-        .wrong-list { text-align: left; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin-top: 20px; max-height: 200px; overflow-y: auto; font-size: 1.2rem; }
-        .wrong-item { color: #ff6b6b; margin-bottom: 8px; border-bottom: 1px solid #444; padding-bottom: 4px; }
-        
-        /* 营销专用按钮样式 */
-        .action-btn { background: var(--secondary); color: #331111; border: none; padding: 18px 50px; font-size: 1.8rem; border-radius: 40px; cursor: pointer; font-weight: bold; margin-top: 25px; box-shadow: 0 5px 0 #b8860b; }
-        .action-btn:active { transform: translateY(4px); box-shadow: none; }
-        .buy-btn { background: linear-gradient(45deg, #ff0055, #ff3300); color: white; box-shadow: 0 5px 0 #990033; animation: pulse 1.5s infinite; }
-
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-
-        /* ========================================= */
-        /* 👇 手机端适配代码 (屏幕小于600px时生效) 👇 */
-        /* ========================================= */
-        @media screen and (max-width: 600px) {
-            /* 1. 缩小容器边距，腾出空间 */
-            .game-card { padding: 15px 15px; border-width: 3px; border-radius: 15px; width: 92%; }
-            
-            /* 2. 强制缩小标题字号 (使用!important覆盖内联样式) */
-            h1[style] { font-size: 2.2rem !important; margin-top: 0; }
-            
-            /* 3. 缩小题目核心大字 */
-            .q-phrase { font-size: 2.5rem; letter-spacing: 2px; }
-            .q-phrase-container { margin: 15px 0; gap: 5px; }
-            .q-instruction { font-size: 1.2rem; }
-
-            /* 4. 调整选项按钮大小 */
-            .options-grid { gap: 10px; }
-            .option-btn { padding: 15px 5px; font-size: 1.6rem; border-radius: 12px; }
-
-            /* 5. 调整营销按钮和正文 */
-            .action-btn { padding: 15px 30px !important; font-size: 1.4rem !important; width: 100%; box-sizing: border-box; }
-            .feedback-box { padding: 15px; margin-top: 15px; }
-            .fb-title { font-size: 1.4rem; }
-            .fb-text { font-size: 1.2rem; }
-            
-            /* 6. 首页文字调整 */
-            #start-screen div[style*="font-size: 1.4rem"] {
-                font-size: 1.1rem !important;
-                padding: 15px !important;
-            }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary {
+            background: linear-gradient(135deg, #0f9f8f, #0f766e);
+            color: white; padding: 14px 24px; font-size: 1.1rem;
+            width: 100%; box-shadow: 0 6px 20px rgba(99,102,241,0.35);
         }
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white; padding: 14px 24px; font-size: 1.1rem;
+            width: 100%; box-shadow: 0 6px 20px rgba(16,185,129,0.35);
+        }
+        .btn-accent {
+            background: linear-gradient(135deg, #f97316, #d97706);
+            color: white; padding: 14px 24px; font-size: 1.1rem;
+            width: 100%; box-shadow: 0 6px 20px rgba(245,158,11,0.35);
+        }
+        .btn-sm {
+            padding: 8px 16px; font-size: 0.85rem; border-radius: 20px;
+            font-weight: 700; border: none; cursor: pointer;
+        }
+        input[type="text"] {
+            width: 100%; padding: 14px 16px; border: 2px solid #ccfbf1;
+            border-radius: 12px; font-size: 1rem; outline: none;
+            transition: border-color 0.2s; background: #fafafe;
+        }
+        input:focus { border-color: var(--primary); background: white; }
+        label { display:block; font-weight:700; margin-bottom:6px; color:#0f766e; font-size:0.9rem; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
+        }
+        .badge-purple { background: var(--primary-light); color: var(--primary-dark); }
+        .badge-green  { background: var(--success-light); color: #065f46; }
+        .badge-amber  { background: var(--accent-light);  color: #92400e; }
+        .badge-red    { background: var(--danger-light);  color: #991b1b; }
+        select {
+            width: 100%; padding: 10px 12px; border: 2px solid #ccfbf1;
+            border-radius: 10px; font-size: 0.95rem; background: white;
+            font-weight: 700; color: var(--text); outline: none;
+        }
+        select:focus { border-color: var(--primary); }
+        .divider { height:1px; background:#ccfbf1; margin:14px 0; }
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .page-title { font-size: 1.15rem; font-weight: 800; color: var(--text); }
+        .back-btn {
+            background: var(--primary-light); color: var(--primary-dark);
+            border: none; border-radius: 20px; padding: 6px 14px;
+            font-weight: 700; font-size: 0.85rem; cursor: pointer;
+        }
+
+        /* ===== SCREEN 1: LOGIN ===== */
+        #screen-login {
+            max-width: 420px; margin: 0 auto;
+            padding-top: 40px;
+        }
+        .login-hero {
+            text-align: center; margin-bottom: 28px;
+        }
+        .login-hero .emoji { font-size: 4rem; margin-bottom: 8px; display:block; }
+        .login-hero h1 { font-size: 1.8rem; color: var(--primary-dark); font-weight:900; }
+        .login-hero p  { color: var(--sub); font-size:0.9rem; margin-top:4px; }
+        .user-list { margin-top: 16px; }
+        .user-list-title { font-size: 0.8rem; color: var(--sub); margin-bottom: 8px; }
+        .user-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 14px; background: var(--primary-light); border-radius: 20px;
+            margin: 4px; cursor: pointer; font-weight:700; color: var(--primary-dark);
+            font-size:0.9rem; border:2px solid transparent; transition:all 0.15s;
+        }
+        .user-chip:active { border-color: var(--primary); transform: scale(0.97); }
+        .ios-tip {
+            background: #fff7ed; border: 1px solid #fed7aa; border-radius:10px;
+            padding: 10px 12px; font-size:0.8rem; color:#9a3412; margin-bottom:12px; display:none;
+        }
+
+        /* ===== SCREEN 2: HOME ===== */
+        #screen-home { max-width: 480px; margin: 0 auto; }
+        .home-topbar {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 12px; gap: 8px;
+        }
+        .stat-chip {
+            flex: 1; background: var(--card); border-radius: 14px;
+            padding: 10px 10px; text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer;
+            border: 1px solid var(--border); transition: all 0.15s;
+        }
+        .stat-chip:active { transform: scale(0.97); }
+        .stat-chip .num { font-size: 1.4rem; font-weight:900; color: var(--primary-dark); }
+        .stat-chip .lbl { font-size: 0.65rem; color: var(--sub); margin-top:1px; }
+        .stat-streak .num { color: #d97706; }
+        .stat-mastered .num { color: #059669; }
+        .stat-error .num   { color: #dc2626; }
+        .greeting-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--card); border-radius: 14px; padding: 12px 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 12px;
+            border: 1px solid var(--border);
+        }
+        .greeting-name { font-size: 1rem; font-weight:800; color: var(--text); }
+        .greeting-sub  { font-size: 0.75rem; color: var(--sub); margin-top:2px; }
+        .switch-user-btn {
+            background: #f0f0f8; border: none; border-radius:20px;
+            padding: 6px 12px; font-size:0.75rem; font-weight:700; color:var(--sub); cursor:pointer;
+        }
+        .selector-row {
+            display:flex; gap:8px; margin-bottom:10px;
+        }
+        .selector-row select { flex:1; }
+        .settings-row {
+            display:flex; gap:8px; margin:12px 0;
+        }
+        .setting-group {
+            flex:1; background:#f8f7ff; border-radius:10px;
+            padding:8px 6px; border:1px solid var(--border); text-align:center;
+        }
+        .setting-group label { font-size:0.7rem; color:var(--sub); margin-bottom:3px; text-align:center; }
+        .setting-group select { font-size:0.85rem; padding:4px 2px; border:none; background:transparent; }
+
+        /* ===== REVIEW QUICK ENTRY ===== */
+        .review-quick-btn {
+            width: 100%; padding: 15px 20px;
+            background: linear-gradient(135deg, #f97316, #d97706);
+            color: white; border: none; border-radius: 14px;
+            font-size: 1.05rem; font-weight: 800; cursor: pointer;
+            box-shadow: 0 6px 20px rgba(245,158,11,0.35);
+            margin-bottom: 10px;
+            display: none;
+            align-items: center; justify-content: space-between;
+        }
+        .review-quick-btn .rqb-left { display:flex; align-items:center; gap:8px; }
+        .review-quick-btn .rqb-count {
+            background: rgba(255,255,255,0.28); border-radius: 20px;
+            padding: 3px 12px; font-size: 0.9rem; font-weight:700;
+        }
+
+        .review-alert {
+            background: linear-gradient(135deg,#ffedd5,#fde68a);
+            border:2px solid #f97316; border-radius:14px;
+            padding:14px 16px; margin-bottom:12px; display:none;
+        }
+        .review-alert-title { font-weight:800; color:#92400e; font-size:0.95rem; }
+        .review-alert-sub   { font-size:0.8rem; color:#a16207; margin-top:4px; }
+
+        /* ===== WORD PREVIEW ===== */
+        .preview-section { margin-top: 10px; }
+        .preview-label { font-size:0.8rem; font-weight:700; color:var(--primary-dark); margin-bottom:8px; }
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 10px; max-height: 300px; overflow-y:auto;
+        }
+        .preview-item {
+            background: white; border:1px solid var(--border);
+            border-radius: 10px; padding: 14px 4px; text-align:center;
+        }
+        .preview-item .word {
+            font-size: 2.2rem; font-weight: bold; color: var(--text);
+            font-family: "KaiTi", "楷体", "STKaiti", serif;
+            line-height: 1.2;
+        }
+        .preview-item .num { font-size:0.65rem; color:#aaa; display:block; margin-bottom:2px; }
+
+        /* ===== SCREEN 3: DICTATION RUNNING ===== */
+        #screen-running { max-width: 480px; margin: 0 auto; }
+        .run-header { text-align:center; margin-bottom:12px; }
+        .run-unit-badge {
+            background: var(--primary-light); color: var(--primary-dark);
+            border-radius:20px; padding:5px 14px; font-size:0.8rem; font-weight:700;
+            display:inline-block;
+        }
+        .progress-wrap { margin:10px 0; }
+        .progress-bar {
+            height: 10px; background:#ccfbf1; border-radius:10px; overflow:hidden;
+        }
+        .progress-fill {
+            height:100%;
+            background: linear-gradient(90deg, #0f9f8f, #a78bfa);
+            width:0%; transition:width 0.3s ease-out;
+            border-radius:10px;
+        }
+        .progress-text { text-align:right; font-size:0.75rem; color:var(--sub); margin-top:3px; }
+        .word-stage {
+            text-align:center; padding: 20px 10px;
+        }
+        .word-ordinal {
+            font-size: 0.85rem; color: var(--sub); margin-bottom:8px;
+        }
+        .big-word {
+            font-size: 3.2rem; font-weight: 900; color: var(--text);
+            min-height: 80px; line-height: 1.2;
+            font-family: "KaiTi", "楷体", "STKaiti", serif;
+        }
+        .status-msg { color:var(--sub); font-size:0.9rem; margin-top:8px; min-height:24px; }
+        .countdown-ring {
+            width:54px; height:54px; margin:10px auto;
+        }
+        .countdown-ring svg { width:54px; height:54px; transform:rotate(-90deg); }
+        .countdown-ring circle { fill:none; stroke:#ccfbf1; stroke-width:5; }
+        .countdown-ring .arc { stroke:#0f9f8f; stroke-linecap:round; transition:stroke-dashoffset 0.1s linear; }
+        .countdown-num {
+            position:relative; top:-42px; text-align:center;
+            font-size:1.1rem; font-weight:900; color:var(--primary-dark);
+        }
+        .run-btns { display:flex; gap:10px; margin-top:6px; }
+        .run-btn {
+            flex:1; padding:11px; border-radius:12px; border:none;
+            font-weight:700; font-size:0.9rem; cursor:pointer;
+        }
+        .run-btn-pause { background:#ccfbf1; color:#0f766e; }
+        .run-btn-stop  { background:#fee2e2; color:#b91c1c; }
+
+        /* ===== SCREEN 4: RESULT ===== */
+        #screen-result { max-width: 480px; margin: 0 auto; }
+        .result-hero { text-align:center; padding:16px 0 10px; }
+        .result-star { font-size:3rem; }
+        .result-title { font-size:1.3rem; font-weight:900; margin-top:6px; color:var(--primary-dark); }
+        .result-score { font-size:2.2rem; font-weight:900; color:var(--success); margin:6px 0; }
+        .result-streak { font-size:0.9rem; color:var(--sub); }
+        .result-encourage {
+            background: linear-gradient(135deg,#ccfbf1,#dbeafe);
+            border-radius:12px; padding:12px 16px; margin:12px 0;
+            font-weight:700; color:#3730a3; text-align:center; font-size:0.95rem;
+        }
+        .answer-check-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px,1fr));
+            gap: 8px; margin-top:10px;
+        }
+        .answer-check-item {
+            background: white; border:2px solid #ccfbf1;
+            border-radius: 10px; padding: 14px 4px;
+            text-align:center; position:relative;
+        }
+        .answer-check-item .word {
+            font-size: 2.2rem; font-weight: bold; color: var(--text);
+            font-family: "KaiTi", "楷体", "STKaiti", serif;
+            line-height: 1.2;
+        }
+        .answer-check-item .num { font-size:0.65rem; color:#aaa; display:block; margin-bottom:2px; }
+        .answer-check-item.wrong { border-color:#fca5a5; background:#fff1f2; }
+        .answer-check-item.wrong .word { color:#b91c1c; }
+        .check-box {
+            position: absolute; top:4px; right:4px;
+            width:20px; height:20px; border-radius:5px;
+            border:2px solid #d1d5db; background:white; cursor:pointer;
+            display:flex; align-items:center; justify-content:center; font-size:0.7rem;
+        }
+        .check-box.checked { background:#fee2e2; border-color:#fca5a5; color:#b91c1c; }
+        .result-summary {
+            display:flex; gap:10px; justify-content:center; margin:12px 0;
+        }
+        .summary-chip {
+            padding:8px 16px; border-radius:20px; font-weight:700; font-size:0.85rem;
+        }
+
+        /* ===== SCREEN 5: MASTERED / ERROR BOOK ===== */
+        #screen-mastered, #screen-errors { max-width: 480px; margin: 0 auto; }
+        .word-list-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px,1fr));
+            gap:8px; margin-top:10px;
+        }
+        .word-card {
+            background:white; border:1px solid var(--border); border-radius:10px;
+            padding:10px 4px; text-align:center;
+        }
+        .word-card .w {
+            font-size:1.6rem; font-weight:800; color:var(--text);
+            font-family: "KaiTi", "楷体", "STKaiti", serif;
+        }
+        .word-card .cnt { font-size:0.7rem; color:var(--sub); margin-top:3px; }
+        .empty-tip { text-align:center; color:var(--sub); padding:30px; font-size:0.9rem; }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes popIn  { 0%{transform:scale(0.85);opacity:0} 100%{transform:scale(1);opacity:1} }
+        @keyframes shake  { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        .pop-in  { animation: popIn  0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
+        .bounce  { animation: bounce 0.6s ease both; }
+        .shake   { animation: shake  0.4s ease both; }
     </style>
 </head>
 <body>
-    <div id="game-container" class="game-card">
-        <div id="start-screen">
-            <h1 style="font-size: 4rem; color: var(--secondary); margin-bottom: 5px; text-shadow: 2px 2px 5px #000;">🔥 哪吒降魔 🔥</h1>
-            <div style="background:var(--primary); color:white; display:inline-block; padding:5px 15px; border-radius:10px; font-size:1.2rem; margin-bottom:20px;">✨ 10题精华试玩版 ✨</div>
-            
-            <div style="margin: 20px auto; max-width: 600px; font-size: 1.4rem; text-align: left; background: rgba(255,255,255,0.05); padding: 25px; border-radius: 18px; border: 1px solid rgba(255,204,0,0.3); line-height: 1.8;">
-                <p>👋 <b>家长您好！</b>这是专为五年级孩子打造的趣味纠错特训。</p >
-                <p>📅 <b>科学计划</b>：每天只需练习 2 次，<b>一周即可掌握</b>五年级上册 <b>130道</b> 核心易错题。</p >
-                <p>😄 <b>寓教于乐</b>：让孩子在游戏中<b>轻松搞定错别字</b>，告别枯燥抄写！</p >
-                <p style="border-top: 1px dashed rgba(255,255,255,0.2); margin-top:15px; padding-top:10px; color:#ccc; font-size:1.2rem;">⬇️ <b>试玩内容</b>：本关精选 10 道高频错题，邀您体验。</p >
-            </div>
-            
-            <button class="action-btn" style="font-size: 2rem; padding: 20px 60px; animation: pulse 2s infinite;" onclick="startGame()">开始免费试玩</button>
+
+<!-- ==================== SCREEN 1: LOGIN ==================== -->
+<div id="screen-login" class="screen active">
+    <div class="login-hero">
+        <span class="emoji">📖</span>
+        <h1>五年级错字本听写</h1>
+        <p>每天一组，稳稳攻克易错词！</p>
+    </div>
+
+    <div id="iosTip" class="ios-tip">
+        📱 <b>iPhone用户：</b>请关闭侧边静音键，调大媒体音量再开始。
+    </div>
+
+    <div class="card">
+        <!-- 已有账号快捷列表 -->
+        <div id="existing-users-box" class="user-list" style="display:none">
+            <div class="user-list-title">本设备已有账号，点击直接进入：</div>
+            <div id="user-chips"></div>
+            <div class="divider"></div>
         </div>
 
-        <div id="game-screen" style="display: none;">
-            <div class="header"><span id="score-display">功德点: 0</span><span id="count-display">进度: 1/10</span></div>
-            <div class="progress-track"><div class="progress-fill" id="progress-bar"></div></div>
-            <div id="q-type" class="q-badge"></div>
-            <div class="q-phrase-container" id="q-main-display"></div>
-            <div class="options-grid" id="options-grid"></div>
-            <div class="feedback-box" id="feedback-box"><span id="fb-title" class="fb-title"></span><p id="fb-text" class="fb-text"></p ></div>
-            <button id="next-btn" class="action-btn" style="display:none" onclick="nextQuestion()">斩下个妖孽 ➔</button>
+        <!-- 学号输入 -->
+        <div>
+            <label>输入学号 ID</label>
+            <input type="text" id="login-id" placeholder="例如：S001" maxlength="20"
+                   onkeydown="if(event.key==='Enter') doLogin()">
         </div>
+        <div style="font-size:0.78rem;color:var(--sub);margin:6px 0 14px;">
+            首次输入学号会自动创建账号，数据保存在本设备。
+        </div>
+        <button class="btn btn-primary" onclick="doLogin()">🎧 进入听写</button>
 
-        <div id="result-screen" style="display: none;">
-            <h1 style="font-size: 3.5rem; color: var(--secondary);">体验结束！</h1>
-            <p style="font-size: 1.5rem; margin-bottom: 20px;">您的孩子刚才表现非常棒！<br>本次得分：<span id="final-score" style="color:var(--correct); font-weight:bold; font-size:2rem;">0</span></p >
-            
-            <div id="wrong-record-box" style="margin-bottom:25px;">
-                <p style="text-align:left; color:var(--secondary); font-size: 1.2rem;">📜 体验版错题预览：</p >
-                <div class="wrong-list" id="wrong-list"></div>
-            </div>
+        <div id="login-error" style="color:#dc2626;font-size:0.85rem;margin-top:10px;text-align:center;display:none;"></div>
+    </div>
+</div>
 
-            <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; border: 2px solid var(--primary);">
-                <p style="font-size: 1.4rem; color: #fff; margin-bottom: 15px;">想让孩子一周攻克 <b>130+</b> 核心考点吗？</p >
-                <button class="action-btn buy-btn" onclick="alert('此处可链接到您的微店/付款码页面')">👉 立即解锁完整版</button>
-                <p style="color: #ccc; font-size: 1rem; margin-top: 10px;">包含：全量题库 | 永久使用 | 智能错题本</p >
-            </div>
-            
-            <button style="background:transparent; border:none; color:#888; margin-top:15px; cursor:pointer; text-decoration:underline; font-size: 1.2rem;" onclick="location.reload()">重新试玩本关</button>
+<!-- ==================== SCREEN 2: HOME ==================== -->
+<div id="screen-home" class="screen">
+    <!-- TopBar: 3 stats -->
+    <div class="home-topbar">
+        <div class="stat-chip stat-streak" onclick="void(0)">
+            <div class="num" id="stat-streak">0</div>
+            <div class="lbl">🔥 坚持天数</div>
+        </div>
+        <div class="stat-chip stat-mastered" onclick="openScreen('screen-mastered')">
+            <div class="num" id="stat-mastered">0</div>
+            <div class="lbl">⭐ 已掌握词</div>
+        </div>
+        <div class="stat-chip stat-error" onclick="openScreen('screen-errors')">
+            <div class="num" id="stat-error">0</div>
+            <div class="lbl">📝 错题本</div>
         </div>
     </div>
 
+    <!-- Greeting -->
+    <div class="greeting-bar">
+        <div>
+            <div class="greeting-name" id="greeting-name">Hi！</div>
+            <div class="greeting-sub" id="greeting-sub">今天也要加油哦！</div>
+        </div>
+        <button class="switch-user-btn" onclick="openScreen('screen-login')">切换账号</button>
+    </div>
+
+    <!-- Review Quick Entry (醒目入口，有错词才显示) -->
+    <button class="review-quick-btn" id="review-quick-btn" onclick="startReviewDictation()">
+        <span class="rqb-left">🔥 练习错词</span>
+        <span class="rqb-count" id="review-quick-count">0个待练</span>
+    </button>
+
+    <!-- Review Alert -->
+    <div id="review-alert" class="review-alert">
+        <div class="review-alert-title">🎯 复习时间到！你有不少错误词语等待复习</div>
+        <div class="review-alert-sub">错误词语超过10个，建议先复习一下再继续新单元！</div>
+        <button class="btn btn-accent" style="margin-top:10px;" onclick="startReviewDictation()">🔁 去复习错词</button>
+    </div>
+
+    <div class="card">
+        <!-- Selector -->
+        <div class="selector-row">
+            <select id="sel-grade" onchange="onGradeChange()"></select>
+            <select id="sel-unit"  onchange="onUnitChange()"></select>
+        </div>
+
+        <!-- Settings -->
+        <div class="settings-row">
+            <div class="setting-group">
+                <label>🗣️ 语速</label>
+                <select id="set-rate">
+                    <option value="1">正常</option>
+                    <option value="0.8" selected>稍慢</option>
+                    <option value="0.6">较慢</option>
+                    <option value="0.5">很慢</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label>🔁 次数</label>
+                <select id="set-repeat">
+                    <option value="1">1次</option>
+                    <option value="2" selected>2次</option>
+                    <option value="3">3次</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label>✍️ 书写</label>
+                <select id="set-wait">
+                    <option value="5">5秒</option>
+                    <option value="8" selected>8秒</option>
+                    <option value="12">12秒</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label>🔀 顺序</label>
+                <select id="set-order">
+                    <option value="order" selected>顺序</option>
+                    <option value="random">随机</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="startDictation()">🚀 开始听写</button>
+
+        <!-- Preview -->
+        <div class="preview-section">
+            <div class="divider"></div>
+            <div class="preview-label">📋 本课词语预习</div>
+            <div class="preview-grid" id="preview-grid"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== SCREEN 3: RUNNING ==================== -->
+<div id="screen-running" class="screen">
+    <div class="card">
+        <div class="run-header">
+            <span class="run-unit-badge" id="run-unit-name">课文</span>
+        </div>
+        <div class="progress-wrap">
+            <div class="progress-bar"><div class="progress-fill" id="run-progress-fill"></div></div>
+            <div class="progress-text" id="run-progress-text">0 / 0</div>
+        </div>
+        <div class="word-stage">
+            <div class="word-ordinal" id="run-ordinal">第 1 个</div>
+            <div class="big-word" id="run-word">Ready</div>
+            <div class="status-msg" id="run-status">准备中...</div>
+
+            <div class="countdown-ring" id="countdown-wrap" style="display:none">
+                <svg viewBox="0 0 54 54">
+                    <circle cx="27" cy="27" r="22"/>
+                    <circle class="arc" id="countdown-arc" cx="27" cy="27" r="22"
+                        stroke-dasharray="138.2" stroke-dashoffset="0"/>
+                </svg>
+                <div class="countdown-num" id="countdown-num">8</div>
+            </div>
+        </div>
+        <div class="run-btns">
+            <button class="run-btn run-btn-pause" id="pause-btn" onclick="togglePause()">⏸ 暂停</button>
+            <button class="run-btn run-btn-stop"  onclick="stopDictation()">⏹ 结束</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== SCREEN 4: RESULT ==================== -->
+<div id="screen-result" class="screen">
+    <div class="card">
+        <div class="result-hero">
+            <div class="result-star" id="result-star">🌟</div>
+            <div class="result-title" id="result-title">听写完成！</div>
+            <div class="result-score" id="result-score">0分</div>
+            <div class="result-streak" id="result-streak"></div>
+        </div>
+        <div class="result-encourage" id="result-encourage">加油！继续坚持！</div>
+
+        <div class="result-summary">
+            <span class="summary-chip badge-green" id="sum-correct">✅ 0 个全对</span>
+            <span class="summary-chip badge-red"   id="sum-wrong">❌ 0 个错误</span>
+        </div>
+
+        <div class="divider"></div>
+        <div style="font-weight:700;color:#0f766e;font-size:0.85rem;margin-bottom:6px;">📋 核对答案（点击打错）</div>
+        <div class="answer-check-grid" id="answer-check-grid"></div>
+
+        <div style="height:16px"></div>
+        <button class="btn btn-primary" onclick="submitResult()">✅ 提交结果</button>
+        <div style="height:10px"></div>
+        <button class="btn" style="background:#f0f0f8;color:#0f766e;padding:12px;width:100%;font-size:0.95rem;font-weight:700;" onclick="openScreen('screen-home')">🏠 返回主页</button>
+    </div>
+</div>
+
+<!-- ==================== SCREEN 5a: MASTERED ==================== -->
+<div id="screen-mastered" class="screen">
+    <div class="card">
+        <div class="page-header">
+            <div class="page-title">⭐ 已掌握词语</div>
+            <button class="back-btn" onclick="openScreen('screen-home')">返回</button>
+        </div>
+        <div id="mastered-content"></div>
+    </div>
+</div>
+
+<!-- ==================== SCREEN 5b: ERRORS ==================== -->
+<div id="screen-errors" class="screen">
+    <div class="card">
+        <div class="page-header">
+            <div class="page-title">📝 错题本</div>
+            <button class="back-btn" onclick="openScreen('screen-home')">返回</button>
+        </div>
+        <div id="errors-content"></div>
+        <div style="height:12px"></div>
+        <button class="btn btn-accent" id="error-review-btn" onclick="startReviewDictation()" style="display:none;">
+            🔁 开始复习错词
+        </button>
+    </div>
+</div>
+
+<!-- ==================== DATA ==================== -->
 <script>
-    // --- 音效初始化 (使用安全包裹) ---
-    // 这样写是为了防止在不支持音频的浏览器中报错导致脚本停止
-    let AudioCtx = null;
+window.onerror = function(msg, src, line) {
+    console.error('JS Error line ' + line + ': ' + msg);
+};
+// ===================================================================
+// 教材词语数据（人教版五年级下册）
+// ===================================================================
+const TEXTBOOK_DATA = {
+    "五年级错字本": {
+        gradeLabel: "五年级错字本",
+        units: [
+            {
+                name: "第1天：错字本听写（39个）",
+                words: ["嫉妒","凯旋","琐碎","馈赠","刊物","客栈","凛冽","腼腆","磁铁","鱼鳞","船舵","鉴别","书籍","湖畔","比喻","卓越","堡垒","驯良","苔藓","缴费","嘲笑","依偎","饥渴","辫子","仇敌","冠军","发酵","日寇","水浒","烟熏","嫦娥","宏伟","洪水","鸿运当头","噪音","干燥","急躁","骄傲","郊区"]
+            },
+            {
+                name: "第2天：错字本听写（39个）",
+                words: ["娇气","应接不暇","商量","商议","悲痛","心酸","负荆请罪","震耳欲聋","不屑一顾","悄然无声","饮水思源","畏首畏尾","直言不讳","漠不关心","千真万确","千辛万苦","千军万马","白鹭","榴弹","眸子","咂嘴","筛选","呜呼哀哉","谴责","机械","宽敞","怂恿","蔓延","眼睑","波澜","剔透","抖擞","廉价","诚恳","稀罕","灰烬","歹徒","偏僻","誊写"]
+            },
+            {
+                name: "第3天：错字本听写（39个）",
+                words: ["谨慎","倔强","出差","劳累","试卷","凶神恶煞","龟裂","挨饿","挣钱","划船","更加","难以置信","毕业","气急败坏","孤掌难鸣","攀谈","压榨","噩梦","搁板","花瓣","矮小","油漆","围绕","马蹄","谎言","山崖","体操","繁殖","煤炭","玫瑰","竟然","陪伴","害怕","俏丽","瞅见","辉煌","迟延","历史","严厉"]
+            },
+            {
+                name: "第4天：错字本听写（39个）",
+                words: ["篮球","蔚蓝","必须","需要","功夫","道谢","曾经","出神入化","借钱","考试","狮子","责备","分析","鼓励","捷径","脾气","爆裂","镶嵌","榨菜","箩筐","嘱咐","汛期","热泪盈眶","邮筒","猎豹","安逸","赔偿","蚕丝","发愁","忠臣","平衡","协调","恐惧","诱发","镜匣","仰慕","播种","吩咐","纠缠"]
+            },
+            {
+                name: "第5天：错字本听写（38个）",
+                words: ["懒惰","承诺","得罪","胆怯","拒绝","赤道","侵略","妨碍","隐蔽","陷阱","拐弯","酬谢","崩塌","焦虑","宣誓","谎话","延期","一辆","十趟","托举","长辈","乃翁","狼藉","凉席","祭祀","毁灭","金碧辉煌","俯视","恃强凌弱","拘留","悲哀","上吐下泻","潜伏","宫殿","丘陵","饱览","开销","拍摄"]
+            },
+            {
+                name: "第6天：错字本听写（38个）",
+                words: ["安歇","勉强","飞快地跑","美丽的花","跑得快","玩得开心","感动得流泪","况且","甚至","垂头丧气","严谨","宽大","回报","妄想","周围","浮现","派送","清晰","训斥","健康","秉公执法","荆棘","瞬间","礼毕","利益","寺庙","愈合","寂静","损失","牺牲","提醒","运转","鼻子","钦佩","铺垫","愤怒","贡献","潜艇"]
+            },
+            {
+                name: "第7天：错字本听写（38个）",
+                words: ["钙片","奖励","蕴含","煤屑","赫赫有名","蔺相如","廉颇","津津有味","隆重","悠然","避难","珍惜","香皂","郊外","规划","强迫","谦虚","口罩","遮住","鸵鸟","黎明","皎洁","属于","躺下","般配","勒索","勤劳","摇晃","粗糙","值得","人类","画眉","荒唐","市郊","勤奋","不可思议","不屑","心旷神怡"]
+            }
+        ]
+    }
+};
+
+// ===================================================================
+// 状态管理
+// ===================================================================
+let currentUser = null;
+let userData = {};
+
+let sessionWords = [];
+let sessionIndex = 0;
+let isRunning = false;
+let isPaused = false;
+let isReviewMode = false;
+let wrongInSession = [];
+let sessionUnitKey = "";
+
+const synth = window.speechSynthesis || null;
+let currentUtterance = null;
+let cnVoice = null;
+
+// ===================================================================
+// 语音初始化（普通话）
+// ===================================================================
+function loadVoices() {
+    if (!synth) return;
     try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (AudioContext) {
-            AudioCtx = new AudioContext();
+        const voices = synth.getVoices();
+        cnVoice =
+            voices.find(v => v.lang === 'zh-CN' && v.name.includes('Google')) ||
+            voices.find(v => v.lang === 'zh-CN' && v.name.includes('Ting')) ||
+            voices.find(v => v.lang === 'zh-CN') ||
+            voices.find(v => v.lang === 'zh-HK') ||
+            voices.find(v => v.lang.startsWith('zh'));
+    } catch(e) {}
+}
+try { loadVoices(); } catch(e) {}
+try { if (synth && synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices; } catch(e) {}
+
+// ===================================================================
+// 数据持久化
+// ===================================================================
+function saveData() {
+    try { localStorage.setItem('cn_errorbook_userData', JSON.stringify(userData)); } catch(e) {}
+}
+function loadAllData() {
+    try {
+        userData = JSON.parse(localStorage.getItem('cn_errorbook_userData') || '{}');
+    } catch(e) { userData = {}; }
+}
+function ensureUser(uid) {
+    if (!userData[uid]) {
+        userData[uid] = {
+            name: uid,
+            joinDate: todayStr(),
+            lastDictDate: '',
+            streak: 0,
+            masteredWords: {},
+            errorWords: {},
+            sessionHistory: []
+        };
+    }
+    return userData[uid];
+}
+function getUserData() {
+    return ensureUser(currentUser.id);
+}
+
+// ===================================================================
+// 工具函数
+// ===================================================================
+function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function openScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0,0);
+    if (id === 'screen-login') {
+        document.getElementById('login-id').value = '';
+        document.getElementById('login-error').style.display = 'none';
+        initLoginScreen();
+    }
+    if (id === 'screen-home')     renderHome();
+    if (id === 'screen-mastered') renderMastered();
+    if (id === 'screen-errors')   renderErrors();
+}
+
+// ===================================================================
+// SCREEN 1: 登录
+// ===================================================================
+function initLoginScreen() {
+    loadAllData();
+    const chips = document.getElementById('user-chips');
+    const box   = document.getElementById('existing-users-box');
+    const users = Object.entries(userData).filter(([k]) => k !== '__meta');
+    if (users.length > 0) {
+        box.style.display = 'block';
+        chips.innerHTML = users.map(([id, u]) =>
+            `<span class="user-chip" onclick="quickLogin('${id}')">👤 ${u.name || id}</span>`
+        ).join('');
+    } else {
+        box.style.display = 'none';
+    }
+}
+function showLoginError(msg) {
+    const el = document.getElementById('login-error');
+    el.textContent = msg; el.style.display = 'block';
+}
+function quickLogin(uid) {
+    const u = userData[uid];
+    if (!u) return;
+    currentUser = { id: uid, name: u.name || uid };
+    afterLogin();
+}
+function doLogin() {
+    try {
+        var id = document.getElementById('login-id').value.trim().toUpperCase();
+        if (!id) { showLoginError('请输入学号'); return; }
+        try { userData = JSON.parse(localStorage.getItem('cn_errorbook_userData') || '{}'); } catch(e) { userData = {}; }
+        if (!userData[id]) {
+            userData[id] = {
+                name: id, joinDate: todayStr(), lastDictDate: '', streak: 0,
+                masteredWords: {}, errorWords: {}, sessionHistory: []
+            };
+            try { localStorage.setItem('cn_errorbook_userData', JSON.stringify(userData)); } catch(e) {}
         }
-    } catch(e) {
-        console.log("Audio not supported");
+        currentUser = { id: id, name: userData[id].name || id };
+        document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+        document.getElementById('screen-home').classList.add('active');
+        window.scrollTo(0,0);
+        renderHome();
+    } catch(err) {
+        document.getElementById('login-error').textContent = '出错了：' + err.message;
+        document.getElementById('login-error').style.display = 'block';
+    }
+}
+function afterLogin() {
+    saveData();
+    openScreen('screen-home');
+}
+
+// ===================================================================
+// SCREEN 2: HOME
+// ===================================================================
+function renderHome() {
+    const ud = getUserData();
+
+    const masteredCount = Object.values(ud.masteredWords).filter(v => v.mastered).length;
+    const errorCount    = Object.keys(ud.errorWords).length;
+    document.getElementById('stat-streak').textContent   = ud.streak;
+    document.getElementById('stat-mastered').textContent = masteredCount;
+    document.getElementById('stat-error').textContent    = errorCount;
+    document.getElementById('greeting-name').textContent = `Hi，${ud.name || currentUser.name}！👋`;
+    document.getElementById('greeting-sub').textContent  =
+        ud.streak > 1 ? `已坚持 ${ud.streak} 天，继续加油！` : '今天也要加油哦！';
+
+    const reviewAlert = document.getElementById('review-alert');
+    reviewAlert.style.display = errorCount >= 10 ? 'block' : 'none';
+
+    const rqBtn = document.getElementById('review-quick-btn');
+    if (errorCount > 0) {
+        rqBtn.style.display = 'flex';
+        document.getElementById('review-quick-count').textContent = `${errorCount}个待练`;
+    } else {
+        rqBtn.style.display = 'none';
     }
 
-    function playSound(freq, type, duration) {
-        if (!AudioCtx) return;
+    if (document.getElementById('sel-grade').options.length === 0) {
+        initSelectors();
+    } else {
+        updatePreview();
+    }
+}
+
+function updateStreak(ud) {
+    const today = todayStr();
+    if (ud.lastDictDate === today) return;
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+    const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
+    if (ud.lastDictDate === yStr) {
+        ud.streak = (ud.streak || 0) + 1;
+    } else {
+        ud.streak = 1;
+    }
+    ud.lastDictDate = today;
+}
+
+function initSelectors() {
+    const gradeEl = document.getElementById('sel-grade');
+    gradeEl.innerHTML = '';
+    Object.keys(TEXTBOOK_DATA).forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = TEXTBOOK_DATA[key].gradeLabel;
+        gradeEl.appendChild(opt);
+    });
+    onGradeChange();
+}
+function onGradeChange() {
+    const grade  = document.getElementById('sel-grade').value;
+    const unitEl = document.getElementById('sel-unit');
+    unitEl.innerHTML = '';
+    TEXTBOOK_DATA[grade].units.forEach((u, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = u.name;
+        unitEl.appendChild(opt);
+    });
+    updatePreview();
+}
+function onUnitChange() { updatePreview(); }
+function updatePreview() {
+    const grade = document.getElementById('sel-grade').value;
+    const ui    = parseInt(document.getElementById('sel-unit').value);
+    const words = TEXTBOOK_DATA[grade]?.units[ui]?.words || [];
+    const grid  = document.getElementById('preview-grid');
+    grid.innerHTML = words.map((w, i) =>
+        `<div class="preview-item">
+            <span class="num">${i+1}</span>
+            <div class="word">${w}</div>
+        </div>`
+    ).join('');
+}
+
+// ===================================================================
+// SCREEN 3: DICTATION RUNNING
+// ===================================================================
+function unlockAudio() {
+    if (!synth) return;
+    try {
+        const u = new SpeechSynthesisUtterance('');
+        synth.speak(u);
+        synth.cancel();
+    } catch(e) {}
+    if (!cnVoice) {
         try {
-            const osc = AudioCtx.createOscillator();
-            const gain = AudioCtx.createGain();
-            osc.type = type; osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0.1, AudioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, AudioCtx.currentTime + duration);
-            osc.connect(gain); gain.connect(AudioCtx.destination);
-            osc.start(); osc.stop(AudioCtx.currentTime + duration);
+            const voices = synth.getVoices();
+            cnVoice = voices.find(v => v.lang === 'zh-CN') ||
+                      voices.find(v => v.lang.startsWith('zh')) ||
+                      voices[0] || null;
         } catch(e) {}
     }
+}
 
-    // --- 黄金10题 (固定题库) ---
-    const DB = [
-        { t:"正音试炼", inst:"选出高亮字的读音", phrase:"白<span class='highlight-y'>鹭</span>", opts:["lù", "lòu"], ans:"lù", why:"鹭(lù)鸟，不读lòu。" },
-        { t:"正音试炼", inst:"选出高亮字的读音", phrase:"<span class='highlight-y'>渲</span>染", opts:["xuàn", "xuān"], ans:"xuàn", why:"渲染(xuàn)是四声。" },
-        { t:"正音试炼", inst:"选出高亮字的读音", phrase:"倔<span class='highlight-y'>强</span>", opts:["jiàng", "qiáng"], ans:"jiàng", why:"强(jiàng)不读qiáng。" },
-        { t:"多音迷阵", inst:"选出高亮字的读音", phrase:"淹<span class='highlight-y'>没</span>农田", opts:["mò", "méi"], ans:"mò", why:"没有读méi；沉没读mò。" },
-        { t:"多音迷阵", inst:"选出高亮字的读音", phrase:"土地<span class='highlight-y'>龟</span>裂", opts:["jūn", "guī"], ans:"jūn", why:"乌龟读guī；裂开读jūn。" },
-        { t:"多音迷阵", inst:"选出高亮字的读音", phrase:"勇夺<span class='highlight-y'>冠</span>军", opts:["guàn", "guān"], ans:"guàn", why:"桂冠读guān；第一名读guàn。" },
-        { t:"多音迷阵", inst:"选出高亮字的读音", phrase:"<span class='highlight-y'>鲜</span>为人知", opts:["xiǎn", "xiān"], ans:"xiǎn", why:"新鲜读xiān；少见读xiǎn。" },
-        { t:"火眼金睛", inst:"看拼音选汉字", phrase:"yǎn jiǎn", opts:["眼睑", "眼脸"], ans:"眼睑", why:"‘睑’右边是‘佥’，不是‘脸’。" },
-        { t:"火眼金睛", inst:"看拼音选汉字", phrase:"zhàng péng", opts:["帐篷", "账篷"], ans:"帐篷", why:"帐篷用巾字旁，账本用贝字旁。" },
-        { t:"火眼金睛", inst:"成语补全", phrase:"再接再__", opts:["厉", "励"], ans:"厉", why:"厉指磨刀石，厉兵秣马。" }
-    ];
+function startDictation() {
+    unlockAudio();
+    const grade = document.getElementById('sel-grade').value;
+    const ui    = parseInt(document.getElementById('sel-unit').value);
+    const unit  = TEXTBOOK_DATA[grade].units[ui];
+    const orderMode = document.getElementById('set-order').value;
 
-    let currentPool = []; let idx = 0; let score = 0; let wrongRecords = [];
-
-    function startGame() {
-        // 核心修复：优先执行界面切换，绝对保证点击有反应
-        document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('game-screen').style.display = 'block';
-
-        // 尝试恢复音效（即使失败也不影响界面）
-        if (AudioCtx && AudioCtx.state === 'suspended') {
-            AudioCtx.resume().catch(e => console.log("Audio resume skipped"));
-        }
-        
-        currentPool = [...DB]; // 使用固定10题
-        idx = 0; score = 0; wrongRecords = [];
-        showQuestion();
-    }
-
-    function showQuestion() {
-        const q = currentPool[idx];
-        document.getElementById('count-display').innerText = `进度: ${idx + 1}/10`;
-        document.getElementById('progress-bar').style.width = `${((idx+1) / 10) * 100}%`;
-        document.getElementById('score-display').innerText = `功德点: ${score}`;
-        document.getElementById('q-type').innerText = q.t;
-        
-        document.getElementById('q-main-display').innerHTML = `
-            <div class="q-instruction">${q.inst}：</div>
-            <div class="q-phrase">${q.phrase}</div>
-        `;
-        
-        const grid = document.getElementById('options-grid'); grid.innerHTML = '';
-        let opts = [...q.opts].sort(() => Math.random() - 0.5);
-        opts.forEach(opt => {
-            const btn = document.createElement('button'); btn.className = 'option-btn';
-            btn.innerText = opt; btn.onclick = () => { playSound(600, 'sine', 0.1); check(btn, opt, q); };
-            grid.appendChild(btn);
-        });
-        document.getElementById('feedback-box').style.display = 'none';
-        document.getElementById('next-btn').style.display = 'none';
-    }
-
-    function check(btn, val, q) {
-        document.querySelectorAll('.option-btn').forEach(b => b.onclick = null);
-        const isCorrect = val === q.ans;
-        if (isCorrect) {
-            playSound(880, 'triangle', 0.3);
-            btn.classList.add('correct'); score += 10; // 试玩版每题10分，总分100
-            document.getElementById('fb-title').innerText = "✅ 回答正确！";
-            document.getElementById('fb-title').style.color = "var(--correct)";
-        } else {
-            playSound(150, 'sawtooth', 0.4);
-            btn.classList.add('wrong');
-            // 去除高亮标签，仅显示纯文本供记录
-            const pureText = q.phrase.replace(/<[^>]+>/g, '');
-            wrongRecords.push({ phrase: pureText, ans: q.ans });
-            document.getElementById('fb-title').innerText = "❌ 正确答案是：";
-            document.getElementById('fb-title').style.color = "var(--wrong)";
-            document.querySelectorAll('.option-btn').forEach(b => { if(b.innerText === q.ans) b.classList.add('correct'); });
-        }
-        document.getElementById('fb-text').innerText = q.why;
-        document.getElementById('feedback-box').style.display = 'block';
-        document.getElementById('next-btn').style.display = 'inline-block';
-    }
-
-    function nextQuestion() {
-        idx++;
-        if (idx < currentPool.length) showQuestion();
-        else showResult();
-    }
-
-    function showResult() {
-        document.getElementById('game-screen').style.display = 'none';
-        document.getElementById('result-screen').style.display = 'block';
-        document.getElementById('final-score').innerText = score;
-        const list = document.getElementById('wrong-list');
-        if (wrongRecords.length === 0) {
-            list.innerHTML = "<p style='color:var(--correct)'>太棒了！10道题全部正确！您的孩子基础非常扎实。</p >";
-        } else {
-            list.innerHTML = wrongRecords.map(r => `<div class="wrong-item">${r.phrase} 👉 正确：${r.ans}</div>`).join('');
+    isReviewMode = false;
+    let words = [...unit.words];
+    if (orderMode === 'random') {
+        for (let i = words.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [words[i], words[j]] = [words[j], words[i]];
         }
     }
+    sessionWords = words;
+    sessionUnitKey = `${grade}__${ui}`;
+
+    document.getElementById('run-unit-name').textContent =
+        unit.name + (orderMode === 'random' ? ' 🔀' : '');
+    openScreen('screen-running');
+    runDictation();
+}
+
+function startReviewDictation() {
+    unlockAudio();
+    const ud = getUserData();
+    const errWords = Object.keys(ud.errorWords);
+    if (errWords.length === 0) { alert('错题本是空的！'); return; }
+
+    isReviewMode = true;
+    sessionWords = errWords.slice(0, 20);
+    sessionUnitKey = '__review__';
+    document.getElementById('run-unit-name').textContent = '🔁 错词复习';
+    openScreen('screen-running');
+    runDictation();
+}
+
+async function runDictation() {
+    isRunning = true; isPaused = false;
+    sessionIndex = 0;
+    wrongInSession = [];
+
+    const wordEl    = document.getElementById('run-word');
+    const statusEl  = document.getElementById('run-status');
+    const ordinalEl = document.getElementById('run-ordinal');
+    const total = sessionWords.length;
+
+    if (synth) {
+        synth.cancel();
+        const warmUp = new SpeechSynthesisUtterance('');
+        synth.speak(warmUp);
+    }
+
+    statusEl.textContent = '准备开始...';
+    for (let i = 3; i > 0; i--) {
+        wordEl.textContent = i;
+        wordEl.style.fontFamily = '';
+        await sleep(900);
+    }
+    wordEl.textContent = '';
+
+    while (sessionIndex < total && isRunning) {
+        updateRunProgress();
+        await waitWhilePaused();
+        if (!isRunning) break;
+
+        const word = sessionWords[sessionIndex];
+        ordinalEl.textContent = `第 ${sessionIndex + 1} 个 / 共 ${total} 个`;
+        wordEl.style.animation = 'none';
+        wordEl.offsetHeight;
+        wordEl.style.animation = 'popIn 0.35s both';
+        wordEl.textContent = `#${sessionIndex + 1}`;
+        wordEl.style.color = '#6b7280';
+        wordEl.style.fontFamily = '';
+
+        statusEl.textContent = '🔊 朗读中...';
+
+        const repeat = parseInt(document.getElementById('set-repeat').value);
+        for (let r = 0; r < repeat; r++) {
+            await waitWhilePaused();
+            if (!isRunning) break;
+            await speakWord(word);
+            if (r < repeat - 1) await sleep(1000);
+        }
+
+        if (!isRunning) break;
+
+        wordEl.style.color = '#ccfbf1';
+        statusEl.textContent = '✍️ 书写中...';
+        const waitSec = parseInt(document.getElementById('set-wait').value);
+        await runCountdown(waitSec);
+
+        sessionIndex++;
+    }
+
+    if (isRunning) showResult();
+}
+
+async function runCountdown(seconds) {
+    const wrap     = document.getElementById('countdown-wrap');
+    const arcEl    = document.getElementById('countdown-arc');
+    const numEl    = document.getElementById('countdown-num');
+    const total_ms = seconds * 1000;
+    const R = 22, C = 2 * Math.PI * R;
+
+    wrap.style.display = 'block';
+    arcEl.style.strokeDasharray  = C;
+    arcEl.style.strokeDashoffset = 0;
+
+    const start = Date.now();
+    while (true) {
+        if (!isRunning) break;
+        await waitWhilePaused();
+        const elapsed = Date.now() - start;
+        const remain  = Math.max(0, total_ms - elapsed);
+        const frac    = remain / total_ms;
+        arcEl.style.strokeDashoffset = C * (1 - frac);
+        numEl.textContent = Math.ceil(remain / 1000);
+        if (remain <= 0) break;
+        await sleep(80);
+    }
+    wrap.style.display = 'none';
+}
+
+function updateRunProgress() {
+    const total = sessionWords.length;
+    const pct   = (sessionIndex / total) * 100;
+    document.getElementById('run-progress-fill').style.width = pct + '%';
+    document.getElementById('run-progress-text').textContent = `${sessionIndex} / ${total}`;
+}
+
+async function waitWhilePaused() {
+    while (isPaused && isRunning) await sleep(200);
+}
+
+function togglePause() {
+    isPaused = !isPaused;
+    const btn = document.getElementById('pause-btn');
+    if (isPaused) {
+        if (synth) synth.cancel();
+        btn.textContent = '▶ 继续';
+        document.getElementById('run-status').textContent = '⏸ 已暂停';
+    } else {
+        btn.textContent = '⏸ 暂停';
+    }
+}
+function stopDictation() {
+    if (confirm('确定要提前结束吗？')) {
+        isRunning = false;
+        if (synth) synth.cancel();
+        openScreen('screen-home');
+    }
+}
+
+function speakWord(text) {
+    return new Promise(resolve => {
+        if (!synth) { setTimeout(resolve, 800); return; }
+
+        if (!cnVoice) {
+            try {
+                const voices = synth.getVoices();
+                cnVoice = voices.find(v => v.lang === 'zh-CN') ||
+                          voices.find(v => v.lang.startsWith('zh')) ||
+                          voices[0] || null;
+            } catch(e) {}
+        }
+
+        synth.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang  = 'zh-CN';
+        u.rate  = parseFloat(document.getElementById('set-rate').value);
+        u.pitch = 1.0;
+
+        if (cnVoice) u.voice = cnVoice;
+
+        currentUtterance = u;
+        u.onend   = () => { currentUtterance = null; resolve(); };
+        u.onerror = () => { currentUtterance = null; resolve(); };
+        synth.speak(u);
+
+        const timeout = Math.max(4000, text.length * 800);
+        setTimeout(() => { if (currentUtterance === u) { currentUtterance = null; resolve(); } }, timeout);
+    });
+}
+
+// ===================================================================
+// SCREEN 4: RESULT
+// ===================================================================
+function showResult() {
+    openScreen('screen-result');
+    isRunning = false;
+
+    const grid = document.getElementById('answer-check-grid');
+    grid.innerHTML = sessionWords.map((w, i) =>
+        `<div class="answer-check-item" id="aci-${i}">
+            <span class="num">${i+1}</span>
+            <div class="word">${w}</div>
+            <div class="check-box" id="cb-${i}" onclick="toggleWrong(${i})"></div>
+        </div>`
+    ).join('');
+
+    updateResultSummary();
+
+    const ud = getUserData();
+    document.getElementById('result-streak').textContent = `🔥 今天是你坚持的第 ${ud.streak} 天`;
+    refreshEncourage(0, sessionWords.length);
+}
+
+function toggleWrong(idx) {
+    const item = document.getElementById(`aci-${idx}`);
+    const cb   = document.getElementById(`cb-${idx}`);
+    const word = sessionWords[idx];
+    const isNowWrong = !item.classList.contains('wrong');
+    item.classList.toggle('wrong', isNowWrong);
+    cb.classList.toggle('checked', isNowWrong);
+    cb.textContent = isNowWrong ? '✗' : '';
+    if (isNowWrong) { if (!wrongInSession.includes(word)) wrongInSession.push(word); }
+    else { wrongInSession = wrongInSession.filter(w => w !== word); }
+    updateResultSummary();
+}
+
+function updateResultSummary() {
+    const wrong   = wrongInSession.length;
+    const correct = sessionWords.length - wrong;
+    const score   = Math.round((correct / sessionWords.length) * 100);
+    document.getElementById('result-score').textContent = score + '分';
+    document.getElementById('sum-correct').textContent  = `✅ ${correct} 个全对`;
+    document.getElementById('sum-wrong').textContent    = `❌ ${wrong} 个错误`;
+    document.getElementById('result-star').textContent  = score >= 90 ? '🌟' : score >= 70 ? '🎉' : '💪';
+    refreshEncourage(wrong, sessionWords.length);
+}
+
+function refreshEncourage(wrong, total) {
+    const ud = getUserData();
+    let msg = '';
+    if (wrong === 0)              msg = `太棒了！全部正确！你是词语大师！🏆`;
+    else if (wrong <= 2)          msg = `非常好！只错了 ${wrong} 个，继续加油！😊`;
+    else if (wrong <= total*0.3)  msg = `不错哦！已经坚持了 ${ud.streak} 天，为你点赞！⭐`;
+    else                          msg = `没关系，多练几次就记住啦！坚持就是胜利！💪`;
+    document.getElementById('result-encourage').textContent = msg;
+}
+
+function submitResult() {
+    const ud = getUserData();
+
+    wrongInSession.forEach(w => {
+        ud.errorWords[w] = (ud.errorWords[w] || 0) + 1;
+        if (ud.masteredWords[w]) delete ud.masteredWords[w];
+    });
+
+    sessionWords.forEach(w => {
+        if (wrongInSession.includes(w)) return;
+        if (!ud.masteredWords[w]) ud.masteredWords[w] = { correctStreak: 0 };
+        ud.masteredWords[w].correctStreak = (ud.masteredWords[w].correctStreak || 0) + 1;
+        if (ud.masteredWords[w].correctStreak >= 2) {
+            ud.masteredWords[w].mastered = true;
+            delete ud.errorWords[w];
+        }
+    });
+
+    updateStreak(ud);
+    saveData();
+    openScreen('screen-home');
+}
+
+// ===================================================================
+// SCREEN 5a: MASTERED
+// ===================================================================
+function renderMastered() {
+    const ud      = getUserData();
+    const mastered = Object.entries(ud.masteredWords).filter(([,v]) => v && v.mastered);
+    const el = document.getElementById('mastered-content');
+    if (mastered.length === 0) {
+        el.innerHTML = '<div class="empty-tip">还没有掌握的词语，加油听写！🌱</div>';
+        return;
+    }
+    el.innerHTML = `<div style="color:var(--sub);font-size:0.8rem;margin-bottom:8px;">共掌握 ${mastered.length} 个词语 🎉</div>` +
+        `<div class="word-list-grid">` +
+        mastered.map(([w]) =>
+            `<div class="word-card"><div class="w">${w}</div><div class="cnt">已掌握 ⭐</div></div>`
+        ).join('') +
+        `</div>`;
+}
+
+// ===================================================================
+// SCREEN 5b: ERRORS
+// ===================================================================
+function renderErrors() {
+    const ud     = getUserData();
+    const errors = Object.entries(ud.errorWords);
+    const el     = document.getElementById('errors-content');
+    const btn    = document.getElementById('error-review-btn');
+
+    if (errors.length === 0) {
+        el.innerHTML = '<div class="empty-tip">错题本是空的，你太厉害了！🌟</div>';
+        btn.style.display = 'none';
+        return;
+    }
+    btn.style.display = 'block';
+    el.innerHTML = `<div style="color:var(--sub);font-size:0.8rem;margin-bottom:8px;">共 ${errors.length} 个错词，别忘了复习哦！</div>` +
+        `<div class="word-list-grid">` +
+        errors.sort((a,b) => b[1]-a[1]).map(([w, cnt]) =>
+            `<div class="word-card"><div class="w">${w}</div><div class="cnt">错了 ${cnt} 次</div></div>`
+        ).join('') +
+        `</div>`;
+}
+
+// ===================================================================
+// 页面启动
+// ===================================================================
+(function init() {
+    try {
+        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (isIOS) document.getElementById('iosTip').style.display = 'block';
+    } catch(e) {}
+    initLoginScreen();
+})();
 </script>
 </body>
 </html>
+
